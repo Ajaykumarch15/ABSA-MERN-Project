@@ -1,0 +1,27 @@
+{
+	"info": {
+		"_postman_id": "280ba8ad-8a45-4210-9f82-e035fbbf7285",
+		"name": "ABSA-MERN-Project-APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48873403",
+		"_collection_link": "https://ajaykumarchodipilli15-8544084.postman.co/workspace/chodipilli-ajay-kumar's-Workspa~ab77ced4-6c03-4da5-8166-b14bdd4bd680/collection/48873403-280ba8ad-8a45-4210-9f82-e035fbbf7285?action=share&source=collection_link&creator=48873403"
+	},
+	"item": [
+		{
+			"name": "Signup API",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Login API",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
