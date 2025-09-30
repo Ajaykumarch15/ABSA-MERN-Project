@@ -11,18 +11,47 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signup", form);
-      alert(res.data.message);
+      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      });
+
+      if (response && response.data) {
+        console.log("Signup response:", response.data);
+        alert("Signup successful!");
+      } else {
+        console.error("No response data");
+        alert("Signup failed! No data received");
+      }
     } catch (err) {
-      alert(err.response.data.error);
+      console.error("Error in signup:", err.response?.data || err.message);
+      alert("Signup failed: " + (err.response?.data?.message || err.message));
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input name="username" placeholder="Username" onChange={handleChange} />
-      <input name="email" placeholder="Email" type="email" onChange={handleChange} />
-      <input name="password" placeholder="Password" type="password" onChange={handleChange} />
+      <input
+        name="username"
+        placeholder="Username"
+        value={form.username}
+        onChange={handleChange}
+      />
+      <input
+        name="email"
+        placeholder="Email"
+        type="email"
+        value={form.email}
+        onChange={handleChange}
+      />
+      <input
+        name="password"
+        placeholder="Password"
+        type="password"
+        value={form.password}
+        onChange={handleChange}
+      />
       <button type="submit">Sign Up</button>
     </form>
   );
