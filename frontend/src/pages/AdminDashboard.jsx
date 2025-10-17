@@ -1,51 +1,91 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import React, { useEffect, useState } from "react";
+import { fetchAllFeedbacks } from "../api/adminService";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-const data = [
-  { aspect: "Quality", sentiment: 80 },
-  { aspect: "Price", sentiment: 65 },
-  { aspect: "Delivery", sentiment: 90 },
-  { aspect: "Support", sentiment: 70 },
-];
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-function AdminDashboard() {
+const AdminDashboard = () => {
+  const [feedbacks, setFeedbacks] = useState([]);
+
+  useEffect(() => {
+    const loadFeedbacks = async () => {
+      try {
+        const data = await fetchAllFeedbacks();
+        setFeedbacks(data);
+      } catch (err) {
+        console.error("Error loading feedbacks:", err);
+      }
+    };
+    loadFeedbacks();
+  }, []);
+
+  // Aggregate overall sentiment stats
+  const sentimentCounts = feedbacks.reduce(
+    (acc, f) => {
+      acc[f.overallSentiment] = (acc[f.overallSentiment] || 0) + 1;
+      return acc;
+    },
+    { positive: 0, neutral: 0, negative: 0 }
+  );
+
+  const chartData = {
+    labels: ["Positive", "Neutral", "Negative"],
+    datasets: [
+      {
+        data: [
+          sentimentCounts.positive,
+          sentimentCounts.neutral,
+          sentimentCounts.negative,
+        ],
+        backgroundColor: ["#22c55e", "#facc15", "#ef4444"],
+      },
+    ],
+  };
+
   return (
-    <div className="flex">
-      <div className="w-64 bg-blue-700 text-white p-6 min-h-screen">
-        <h2 className="text-2xl font-bold mb-6">Admin Panel</h2>
-        <ul className="space-y-4">
-          <li className="hover:text-blue-200 cursor-pointer">Overview</li>
-          <li className="hover:text-blue-200 cursor-pointer">Manage Users</li>
-          <li className="hover:text-blue-200 cursor-pointer">Reports</li>
-        </ul>
+    <div className="p-6 space-y-8">
+      <h1 className="text-3xl font-bold text-blue-700">Admin Dashboard</h1>
+
+      <div className="w-80 mx-auto">
+        <Pie data={chartData} />
       </div>
 
-      <div className="flex-1 p-6 bg-gray-100">
-        <h1 className="text-3xl font-bold text-blue-700 mb-6">Admin Dashboard</h1>
-
-        <div className="grid grid-cols-2 gap-6 mb-10">
-          <div className="bg-white shadow rounded-lg p-4 text-center">
-            <h3 className="text-lg font-semibold text-gray-600">Total Users</h3>
-            <p className="text-3xl font-bold text-blue-600">120</p>
-          </div>
-          <div className="bg-white shadow rounded-lg p-4 text-center">
-            <h3 className="text-lg font-semibold text-gray-600">Total Feedback</h3>
-            <p className="text-3xl font-bold text-green-600">230</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">Aspect Sentiment Overview</h3>
-          <BarChart width={600} height={300} data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="aspect" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="sentiment" fill="#3B82F6" />
-          </BarChart>
-        </div>
+      <div className="bg-white shadow rounded-lg p-6">
+        <h2 className="text-2xl font-semibold mb-4">User Feedbacks</h2>
+        <table className="min-w-full border-collapse border border-gray-200">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-200 px-4 py-2">User</th>
+              <th className="border border-gray-200 px-4 py-2">Feedback</th>
+              <th className="border border-gray-200 px-4 py-2">Sentiment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {feedbacks.map((f) => (
+              <tr key={f._id} className="hover:bg-gray-50">
+                <td className="border px-4 py-2">
+                  {f.userId?.username || "Unknown"}
+                </td>
+                <td className="border px-4 py-2">{f.text}</td>
+                <td
+                  className={`border px-4 py-2 font-semibold ${
+                    f.overallSentiment === "positive"
+                      ? "text-green-600"
+                      : f.overallSentiment === "neutral"
+                      ? "text-yellow-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {f.overallSentiment}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-}
+};
 
 export default AdminDashboard;

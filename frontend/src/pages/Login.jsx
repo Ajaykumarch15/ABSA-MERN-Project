@@ -1,52 +1,74 @@
-import { useState } from "react";
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", form);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
+    setError("");
 
-      if (res.data.role === "admin") {
-        window.location.href = "/admin";
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password,
+      });
+
+      const { token, user } = response.data;
+
+      // ✅ Save token & user data
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // ✅ Redirect by role
+      if (user.role === "admin") {
+        navigate("/admin");
       } else {
-        window.location.href = "/user";
+        navigate("/user");
       }
     } catch (err) {
-      alert(err.response?.data?.error || "Login failed");
+      console.error(err);
+      setError(err.response?.data?.message || "Invalid email or password");
     }
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 shadow-lg rounded-2xl w-96 space-y-5"
+      >
+        <h2 className="text-2xl font-bold text-center text-green-600">
+          Login
+        </h2>
+
         <input
-          name="email"
-          placeholder="Email"
           type="email"
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Email"
+          className="w-full p-3 border rounded-lg"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
+
         <input
-          name="password"
-          placeholder="Password"
           type="password"
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Password"
+          className="w-full p-3 border rounded-lg"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
+
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+
         <button
           type="submit"
-          className="w-full bg-red-600 text-white font-bold py-3 rounded-lg shadow-md hover:bg-red-700 transition duration-300"
+          className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
         >
           Login
         </button>
