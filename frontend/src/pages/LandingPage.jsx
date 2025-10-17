@@ -10,9 +10,9 @@ function LandingPage() {
     <div className="min-h-screen bg-gray-50 font-sans">
       
       {/* Navigation Bar (A darker primary color for contrast) */}
-      <nav className="bg-blue-600 p-4 shadow-lg">
+      {/* <nav className="bg-blue-600 p-4 shadow-lg">  </nav>*/ } 
         
-      </nav>
+     
 
       {/* Main Content Area */}
       <main className="container mx-auto p-4 sm:p-8 flex flex-col lg:flex-row items-center justify-between">

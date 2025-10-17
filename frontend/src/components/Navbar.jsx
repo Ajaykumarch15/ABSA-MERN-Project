@@ -20,8 +20,8 @@ function Navbar() {
         <div className="space-x-4">
           {!token ? (
             <>
-              <Link to="/login" className="text-white hover:text-blue-200">Login</Link>
-              <Link to="/signup" className="text-white hover:text-blue-200">Signup</Link>
+              <Link to="/login" className="text-white hover:text-blue-400">Login</Link>
+              <Link to="/signup" className="text-white hover:text-blue-400">Signup</Link>
             </>
           ) : (
             <>
